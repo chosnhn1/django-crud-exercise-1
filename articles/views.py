@@ -19,4 +19,10 @@ class ArticleList(APIView):
             serializer.save(author=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class ArticleInstanceView(APIView):
+    def patch(self, request):
+        pass
+    def delete(self, request):
+        pass
     
