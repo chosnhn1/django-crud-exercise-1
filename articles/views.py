@@ -3,10 +3,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from articles.models import Article
 from articles.serializers import ArticleSerializer, CommentSerializer
-from rest_framework import status
+from rest_framework import status, authentication, permissions
 
 # Create your views here.
 class ArticleList(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def get(self, request):
         articles = get_list_or_404(Article)
         serializer = ArticleSerializer(articles, many=True)
@@ -21,6 +23,8 @@ class ArticleList(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class ArticleInstanceView(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def get(self, request, pk):
         article = get_object_or_404(Article, pk=pk)
         serializer = ArticleSerializer(article)
