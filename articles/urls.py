@@ -19,4 +19,5 @@ from articles import views
 
 urlpatterns = [
     path('', views.ArticleList.as_view()),
+    path('<int:pk>/', views.ArticleInstanceView.as_view()),
 ]
