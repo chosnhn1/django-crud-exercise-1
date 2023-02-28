@@ -13,7 +13,6 @@ from accounts.models import User
 
 class UserAPI(APIView):
     def get(self, request):
-
         return
     
     def post(self, request):

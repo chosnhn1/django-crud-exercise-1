@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from articles.models import Article
+from articles.models import Article, Comment
 from articles.serializers import ArticleSerializer, CommentSerializer
 from rest_framework import status, authentication, permissions
 
@@ -43,10 +43,34 @@ class ArticleInstanceView(APIView):
         
     def delete(self, request, pk):
         article = get_object_or_404(Article, pk=pk)
-        if article.author == request.user:
+        if article.author == request.user or request.user.is_admin:
             article.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
         
     
+class CommentInstanceView(APIView):
+    def post(self, request, article_pk):
+        article = get_object_or_404(Article, pk=article_pk)
+        serializer = CommentSerializer(request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(article=article)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, pk):
+        comment = get_object_or_404(Comment, pk=pk)
+        serializer = CommentSerializer(comment, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk):
+        comment = get_object_or_404(Comment, pk=pk)
+        if comment.author == request.user or request.user.is_admin:
+            comment.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
